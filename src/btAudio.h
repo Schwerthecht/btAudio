@@ -63,6 +63,7 @@ class btAudio {
 	bool _filtering=false;
 	bool _compressing=false;
     static int32_t  _sampleRate;
+    static bool _i2sEnabled;
 	static int _postprocess;
 	
 	// static function causes a static infection of variables
