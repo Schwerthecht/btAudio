@@ -6,6 +6,7 @@
  float btAudio::_vol=0.95;
  esp_bd_addr_t btAudio::_address;
  int32_t btAudio::_sampleRate=44100;
+ bool btAudio::_i2sEnabled = false;
   
  String btAudio::title="";
  String btAudio::album="";
@@ -140,9 +141,12 @@ void btAudio::a2d_cb(esp_a2d_cb_event_t event, esp_a2d_cb_param_t*param){
                      a2d->audio_cfg.mcc.cie.sbc[1],
                      a2d->audio_cfg.mcc.cie.sbc[2],
                      a2d->audio_cfg.mcc.cie.sbc[3]);
-					 if(i2s_set_sample_rates(I2S_NUM_0, _sampleRate)==ESP_OK){
-						ESP_LOGI("BT_AV", "Audio player configured, sample rate=%d", _sampleRate);
-					 }
+
+            if (_i2sEnabled) {
+                if (i2s_set_sample_rates(I2S_NUM_0, _sampleRate) == ESP_OK) {
+                    ESP_LOGI("BT_AV", "Audio player configured, sample rate=%d", _sampleRate);
+                }
+            }
 		}
 		
         break;
@@ -204,6 +208,8 @@ void btAudio::setSinkCallback(void (*sinkCallback)(const uint8_t *data, uint32_t
 ////////////////// I2S Audio Functionality /////////////////////////
 ////////////////////////////////////////////////////////////////////
 void btAudio::I2S(int bck, int dout, int ws) {
+    _i2sEnabled = true;
+
    // i2s configuration
    uint32_t usamplerate = (uint32_t)_sampleRate;
   static const i2s_config_t i2s_config = {
